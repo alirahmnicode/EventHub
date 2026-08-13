@@ -29,7 +29,7 @@ class DatabaseSettings(BaseSettings):
     host: str = "localhost"
     port: int = 5432
     user: str = "postgres"
-    name: str = "app"
+    db: str = "app"
 
     password: SecretStr
 
@@ -40,7 +40,7 @@ class DatabaseSettings(BaseSettings):
     def dsn(self) -> str:
         return (
             f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}"
-            f"@{self.host}:{self.port}/{self.name}"
+            f"@{self.host}:{self.port}/{self.db}"
         )
 
 
@@ -81,6 +81,12 @@ class Settings(BaseSettings):
     app: AppSettings = Field(default_factory=AppSettings)
     database: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings = Field(default_factory=RedisSettings)
+
+    @property
+    def database_url(self) -> str:
+        if self.app.env == "development":
+            return "sqlite+aiosqlite:///./test.db"
+        return self.database.dsn
 
 
 @lru_cache
