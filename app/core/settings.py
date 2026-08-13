@@ -34,6 +34,7 @@ class DatabaseSettings(BaseSettings):
     password: SecretStr
 
     pool_size: int = 5
+    max_overflow: int = 10
     echo: bool = False
 
     @property
