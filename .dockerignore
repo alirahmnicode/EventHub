@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+
+# Environment/secrets
+.env
+.env.*
+*.pem
+.venv
+
+# Logs
+*.log
+logs/
+
+# Editor configs
+.vscode/
+.idea/
+
+# Docker files 
+Dockerfile
+docker-compose.yml
+
+
+# db
+*.db
+
+# ruff
+.ruff_cache
