@@ -1,6 +1,11 @@
 import enum
 
 
+class UserRole(str, enum.Enum):
+    customer = "customer"
+    admin = "admin"
+
+
 class EventStatus(str, enum.Enum):
     draft = "draft"
     published = "published"

@@ -26,3 +26,5 @@ docker-compose.yml
 
 # ruff
 .ruff_cache
+
+keys/

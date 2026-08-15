@@ -1,4 +1,4 @@
-from app.db.database import Base
+from app.db.engine import Base
 
 from .api_key import ApiKey
 from .enums import EventStatus, OrderStatus, ReservationStatus
@@ -7,7 +7,7 @@ from .feature_flag import FeatureFlag
 from .order import Order
 from .reservation import Reservation
 from .ticket_type import TicketType
-from .users import User
+from .user import User
 from .venue import Venue
 from .webhook_event import WebhookEvent
 

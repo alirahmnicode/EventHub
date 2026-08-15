@@ -2,9 +2,12 @@ import asyncio
 import random
 
 from faker import Faker
+from sqlalchemy import select
 
-from app.db.database import AsyncSessionLocal
-from app.models import Event, Venue
+from app.core.auth import get_hashed_password
+from app.db.engine import AsyncSessionLocal
+from app.models import Event, User, Venue
+from app.models.enums import UserRole
 
 fake = Faker()
 
@@ -47,5 +50,37 @@ async def seed():
         await session.commit()
 
 
+async def create_admin():
+    email = "admin@example.com"
+    password = "admin123"
+    full_name = "admin"
+
+    async with AsyncSessionLocal() as session:
+        # Check if admin already exists
+        existing_user = await session.execute(select(User).where(User.email == email))
+        user_obj = existing_user.scalar_one_or_none()
+
+        if user_obj:
+            print(f"User {email} already exists.")
+            return
+
+        admin = User(
+            email=email,
+            hashed_password=get_hashed_password(password),
+            full_name=full_name,
+            role=UserRole.admin,
+        )
+
+        session.add(admin)
+        await session.flush()
+        await session.commit()
+        await session.refresh(admin)
+
+        print("Admin user created successfully!")
+        print(f"Email: {admin.email}")
+        print(f"ID: {admin.id}")
+
+
 if __name__ == "__main__":
     asyncio.run(seed())
+    asyncio.run(create_admin())
