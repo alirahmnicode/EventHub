@@ -1,15 +1,11 @@
-import enum
 from datetime import datetime
 
 from sqlalchemy import DateTime, Enum, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.database import Base
+from app.db.engine import Base
 
-
-class UserRole(str, enum.Enum):
-    customer = "customer"
-    admin = "admin"
+from .enums import UserRole
 
 
 class User(Base):

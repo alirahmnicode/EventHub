@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from app.db.database import Base
+from app.db.engine import Base
 
 
 def uuid_pk() -> Mapped[str]:

@@ -6,8 +6,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import health
-from app.core.settings import Settings, get_settings
+from app.api.routers import auth, health
+from app.core.config import Settings, get_settings
 
 
 def _configure_cors(app: FastAPI, settings: Settings) -> None:
@@ -22,6 +22,7 @@ def _configure_cors(app: FastAPI, settings: Settings) -> None:
 
 def _register_routers(app: FastAPI) -> None:
     app.include_router(health.router)
+    app.include_router(auth.router)
 
 
 def _lifespan_factory(settings: Settings):

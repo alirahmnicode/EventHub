@@ -4,7 +4,6 @@ Env var mapping uses per-group prefixes (single underscore), e.g.:
   POSTGRES_PORT=5432
   POSTGRES_PASSWORD=supersecret   <-- required, no default
   REDIS_URL=redis://localhost:6379/0
-  JWT__SECRET_KEY=...              <-- required, no default (nested under top-level Settings, if applicable)
   APP_ENV=production
   APP_DEBUG=false
 """
@@ -63,6 +62,32 @@ class AppSettings(BaseSettings):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
 
+class JWTSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="JWT_")
+    # Read from .env
+    jwt_private_key_path: Path = Path("keys/dev_private.pem")
+    jwt_public_key_path: Path = Path("keys/dev_public.pem")
+    jwt_algorithm: str = "RS256"
+
+    jwt_access_token_expire_minutes: int = 15
+    jwt_refresh_token_expire_days: int = 7
+
+
+class CookieSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="COOKIE_")
+
+    # If True, cookies cannot be accessed via JavaScript
+    AUTH_COOKIE_HTTPONLY: bool = False
+
+    # If True, cookies are only sent over HTTPS
+    # Should be False for local HTTP development
+    AUTH_COOKIE_SECURE: bool = True
+
+    # SameSite policy for auth cookies
+    # Possible values: "lax", "strict", "none"
+    AUTH_COOKIE_SAMESITE: str = "none"
+
+
 class Settings(BaseSettings):
     """
     Top-level settings, aggregating nested config groups.
@@ -82,6 +107,8 @@ class Settings(BaseSettings):
     app: AppSettings = Field(default_factory=AppSettings)
     database: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings = Field(default_factory=RedisSettings)
+    auth: JWTSettings = Field(default_factory=JWTSettings)
+    cookie: CookieSettings = Field(default_factory=CookieSettings)
 
     @property
     def database_url(self) -> str:
