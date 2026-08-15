@@ -182,3 +182,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 16-week-fastapi.md
+keys/
