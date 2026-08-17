@@ -11,8 +11,8 @@ from alembic import context
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.core.settings import get_settings
-from app.db.database import Base
+from app.core.config import get_settings
+from app.db.engine import Base
 from app.models import *
 
 # app settings

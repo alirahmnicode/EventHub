@@ -1,18 +1,39 @@
 from __future__ import annotations
 
-from sqlalchemy import JSON, String, UniqueConstraint
+from typing import Any
+
+from sqlalchemy import JSON, Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base, uuid_pk
+from .base import Base
 
 
 class FeatureFlag(Base):
     __tablename__ = "feature_flags"
 
-    id: Mapped[str] = uuid_pk()
-    key: Mapped[str] = mapped_column(String(120), nullable=False)
-    enabled: Mapped[bool] = mapped_column(nullable=False, default=False)
-    # e.g. {"rollout_percentage": 25, "allowed_user_ids": [...], "env": "prod"}
-    rollout_metadata: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    __table_args__ = (UniqueConstraint("key", name="uq_featureflag_key"),)
+    key: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    enabled: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    # Flexible rollout configuration.
+    # Example:
+    # {
+    #     "percentage": 25,
+    #     "user_ids": [1, 2, 3],
+    #     "roles": ["admin"]
+    # }
+    rollout_metadata: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )

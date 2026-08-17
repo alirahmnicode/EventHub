@@ -3,11 +3,17 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import auth, health
+from app.api import admin, auth, health
 from app.core.config import Settings, get_settings
+from app.core.exceptions import (
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
 
 
 def _configure_cors(app: FastAPI, settings: Settings) -> None:
@@ -21,6 +27,10 @@ def _configure_cors(app: FastAPI, settings: Settings) -> None:
 
 
 def _register_routers(app: FastAPI) -> None:
+    # admin routers
+    for router in admin.routers:
+        app.include_router(router)
+
     app.include_router(health.router)
     app.include_router(auth.router)
 
@@ -58,6 +68,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     _configure_cors(app, settings)
     _register_routers(app)
+
+    # add custom exceptions
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(Exception, unhandled_exception_handler)
 
     return app
 
