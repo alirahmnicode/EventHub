@@ -14,7 +14,7 @@ class UserBase(BaseModel):
 
 
 class UserRegister(UserBase):
-    password: str = Field(min_length=8, max_length=128)
+    password: str = Field(min_length=8, max_length=128, examples=["admin123"])
 
     # @field_validator("password")
     # @classmethod
@@ -27,8 +27,8 @@ class UserRegister(UserBase):
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    email: EmailStr = Field(examples=["admin@example.com"])
+    password: str = Field(min_length=8, max_length=128, examples=["admin123"])
 
 
 class UserUpdate(BaseModel):

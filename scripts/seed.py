@@ -26,7 +26,7 @@ async def seed():
                 city=fake.city(),
                 address=fake.street_address(),
                 capacity=random.choice([200, 500, 1000, 5000, 20000]),
-                created_by=fake.name(),
+                created_by=1,
             )
             for _ in range(NUM_VENUES)
         ]
@@ -42,7 +42,7 @@ async def seed():
                     description=fake.text(max_nb_chars=20),
                     starts_at=fake.future_datetime(end_date="+10d"),
                     ends_at=fake.future_datetime(end_date="+90d"),
-                    created_by=fake.name(),
+                    created_by=1,
                 )
                 session.add(event)
                 await session.flush()
@@ -82,5 +82,5 @@ async def create_admin():
 
 
 if __name__ == "__main__":
+    # asyncio.run(create_admin())
     asyncio.run(seed())
-    asyncio.run(create_admin())
