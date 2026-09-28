@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.enums import EventStatus
@@ -32,7 +33,7 @@ class EventBaseSchema(BaseModel):
     @model_validator(mode="after")
     def validate_dates(self):
         if self.ends_at <= self.starts_at:
-            raise ValueError("ends_at must be after starts_at")
+            raise RequestValidationError("ends_at must be after starts_at")
         return self
 
 

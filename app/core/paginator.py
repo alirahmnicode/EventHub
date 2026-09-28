@@ -3,9 +3,6 @@ from typing import TypeVar
 from urllib.parse import urlencode
 
 from fastapi import Request
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Query
 
 from app.schemas.pagination import PaginatedResponse, PaginationLinks
 
@@ -13,30 +10,14 @@ T = TypeVar("T")
 
 
 async def paginate(
-    *,
-    entity,
-    query: Query,
+    total: int,
+    items,
     schema: type[T],
     request: Request,
-    db: AsyncSession,
     page: int,
     page_size: int,
 ) -> PaginatedResponse[T]:
-    # Total number of records
-    count_query = select(func.count()).select_from(entity)
-
-    # If the original query has filters, preserve them
-    count_query = query.with_only_columns(
-        func.count(),
-        maintain_column_froms=True,
-    )
-
-    result = await db.execute(count_query)
-    total = result.scalar_one()
-
     offset = (page - 1) * page_size
-    result = await db.execute(query.offset(offset).limit(page_size))
-    items = result.scalars().all()
     results = [schema.model_validate(item) for item in items]
 
     base_url = str(request.url).split("?")[0]
