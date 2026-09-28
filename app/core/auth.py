@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 import jwt
 from argon2 import PasswordHasher
 from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import DecodeError, InvalidSignatureError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,8 +14,9 @@ from app.models.user import User
 
 ph = PasswordHasher()
 
-
 settings = get_settings()
+
+bearer_scheme = HTTPBearer(auto_error=True)
 
 AUTH_JWT_SECRET_KEY = settings.auth.jwt_private_key_path.read_text()
 AUTH_JWT_PUBLIC_KEY = settings.auth.jwt_public_key_path.read_text()
@@ -107,8 +109,12 @@ def decode_refresh_token(token):
 # ------------------------------------------------------------------------------------------
 
 
-async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)):
-    access_token = request.cookies.get("access_token")
+async def get_current_user(
+    db: AsyncSession = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+):
+    access_token = credentials.credentials
+
     try:
         decoded = jwt.decode(access_token, AUTH_JWT_PUBLIC_KEY, algorithms=ALGORITHM)
         user_id = decoded.get("user_id", None)
@@ -140,7 +146,7 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
     except DecodeError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed, decode failed",
+            detail=f"Authentication failed, decode failed {access_token}",
         )
     except Exception as e:
         raise HTTPException(

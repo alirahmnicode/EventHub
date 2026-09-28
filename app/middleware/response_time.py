@@ -23,7 +23,7 @@ class ResponseTimeMiddleware:
                 headers = MutableHeaders(scope=message)
                 headers.append(RESPONSE_TIME_HEADER, f"{elapsed_ms:.2f}ms")
                 # Stash it somewhere the Prometheus hook can read later
-                scope["state"]["response_time_ms"] = elapsed_ms
+                scope.setdefault("state", {})["response_time_ms"] = elapsed_ms
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
