@@ -13,6 +13,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /code
 
+COPY alembic.ini .
+COPY /alembic .
+
 # 1. Install dependencies only (cached until pyproject.toml / uv.lock change)
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -20,7 +23,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev
 
 # 2. Copy the source code (keeps the `app` folder name)
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock alembic.ini ./
+COPY alembic ./alembic
 COPY app ./app
 
 EXPOSE 8000
