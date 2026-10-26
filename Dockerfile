@@ -25,6 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # 2. Copy the source code (keeps the `app` folder name)
 COPY pyproject.toml uv.lock alembic.ini ./
 COPY alembic ./alembic
+COPY scripts ./scripts
 COPY app ./app
 
 EXPOSE 8000
