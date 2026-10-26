@@ -45,6 +45,10 @@ class PostgresSettings(EnvSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
     POSTGRES_TEST_DB: str = "app_test"
+    DB_POOL_SIZE: int = 10
+    DB_MAX_OVERFLOW: int = 5
+    DB_POOL_TIMEOUT: int = 30
+    DB_POOL_RECYCLE: int = 1800
 
     @computed_field  # type: ignore[prop-decorator]
     @property
