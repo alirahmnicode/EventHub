@@ -22,6 +22,7 @@ from typing import Any, TypeVar
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import get_password_hash
 from app.db.base import SessionLocal, engine
 from app.models import Event, User, Venue
 from app.models.enums import EventStatus, UserRole
@@ -71,6 +72,11 @@ def _report(name: str, created: int, total: int) -> None:
 SEED_PASSWORD = os.getenv("SEED_PASSWORD", "password123")  # dev only
 
 USERS = [
+    {
+        "email": "admin@gmail.local",
+        "full_name": "Admin User",
+        "role": UserRole.ADMIN,
+    },
     {
         "email": "admin@eventhub.local",
         "full_name": "Admin User",
@@ -146,6 +152,14 @@ EVENTS = [
         "hours": 3,
         "status": EventStatus.CANCELLED,
     },
+    {
+        "venue": "Isar Club",
+        "title": "Comedy Open Mic",
+        "description": "Cancelled due to scheduling conflict.",
+        "days_from_now": 21,
+        "hours": 3,
+        "status": EventStatus.PUBLISHED,
+    },
 ]
 
 
@@ -163,7 +177,7 @@ async def seed_users(session: AsyncSession, ctx: Context) -> None:
             defaults={
                 "full_name": data["full_name"],
                 "role": data["role"],
-                "hashed_password": hash_password(SEED_PASSWORD),
+                "hashed_password": get_password_hash(SEED_PASSWORD),
             },
         )
         ctx["users"][user.email] = user
