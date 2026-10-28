@@ -121,3 +121,27 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+from typing import Any, TypeVar
+
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+T = TypeVar("T")
+
+
+def or_404(obj: T | None, what: str) -> T:
+    if obj is None:
+        raise HTTPException(404, f"{what} not found")
+    return obj
+
+
+async def remove_or_409(db: AsyncSession, crud: Any, db_obj: Any, message: str) -> None:
+    """Delete, turning a foreign-key RESTRICT violation into a clean 409."""
+    try:
+        await crud.remove(db, db_obj)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(409, message)
