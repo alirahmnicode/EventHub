@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from app.schemas.base import ORMModel
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.enums import UserRole
+from app.schemas.base import ORMModel
 
 
 class UserBase(BaseModel):
@@ -17,7 +17,7 @@ class UserBase(BaseModel):
         return v.lower()
 
 
-class UserCreate(UserBase):
+class UserRegister(UserBase):
     """Public sign-up. Role is NOT accepted from clients."""
 
     password: str = Field(min_length=8, max_length=128)
@@ -47,3 +47,17 @@ class UserRead(ORMModel, UserBase):
     role: UserRole
     created_at: datetime
     # hashed_password is intentionally absent.
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class TokenPayload(BaseModel):
+    sub: str | None = None
+
+
+class NewPassword(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8, max_length=128)

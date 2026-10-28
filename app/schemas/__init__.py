@@ -8,7 +8,7 @@ from app.schemas.feature_flag import (
 from app.schemas.order import OrderCreate, OrderRead
 from app.schemas.reservation import ReservationCreate, ReservationRead
 from app.schemas.ticket_type import TicketTypeCreate, TicketTypeRead, TicketTypeUpdate
-from app.schemas.user import UserCreate, UserRead, UserRoleUpdate, UserUpdate
+from app.schemas.user import UserRead, UserRegister, UserRoleUpdate, UserUpdate
 from app.schemas.venue import VenueCreate, VenueRead, VenueUpdate
 from app.schemas.webhook_event import WebhookAck, WebhookEventCreate, WebhookEventRead
 
