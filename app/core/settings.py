@@ -36,6 +36,21 @@ class AppSettings(EnvSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     FRONTEND_URL: str = "http://localhost:3000"
+    ALLOW_ORIGINS: list = [
+        "http://localhost.tiangolo.com",
+        "https://localhost.tiangolo.com",
+        "http://localhost",
+        "http://localhost:8080",
+    ]
+    EXPOSE_HEADERS: list = [
+        "X-Request-ID",
+        "X-Response-Time",
+        "X-RateLimit-Remaining",
+        "Retry-After",
+    ]
+    ALLOW_METHODS: list = ["*"]
+    ALLOW_HEADERS: list = ["*"]
+    ALLOW_CREDENTIALS: bool = True
 
 
 class PostgresSettings(EnvSettings):
