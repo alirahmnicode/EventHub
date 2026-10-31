@@ -54,7 +54,11 @@ class PermissionDeniedError(AppError):
 
 
 class ForbiddenError(AppError):
-    status_code, code, message = 403, "forbidden", "You do not have access"
+    status_code, code, message = (
+        status.HTTP_403_FORBIDDEN,
+        "forbidden",
+        "Current user has not access to this operation.",
+    )
 
 
 class NotFoundError(AppError):

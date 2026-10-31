@@ -12,6 +12,7 @@ dependencies = [
     "pyjwt>=2.15.1",
     "pytest>=9.2.0",
     "pytest-asyncio>=1.4.1",
+    "pytest-mock>=3.17.0",
     "sqlalchemy[asyncio]>=2.1.6",
 ]
 
