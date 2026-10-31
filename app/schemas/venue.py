@@ -1,5 +1,6 @@
-from app.schemas.base import ORMModel
 from pydantic import BaseModel, Field
+
+from app.schemas.base import ORMModel
 
 
 class VenueBase(BaseModel):
