@@ -1,3 +1,5 @@
+from fastapi import status
+
 from app.schemas.errors import ErrorDetail, ErrorResponse
 
 ERROR_RESPONSES: dict[int | str, dict] = {
@@ -36,7 +38,19 @@ class BadRequestError(AppError):
 
 
 class UnauthorizedError(AppError):
-    status_code, code, message = 401, "unauthorized", "Authentication required"
+    status_code, code, message = (
+        status.HTTP_401_UNAUTHORIZED,
+        "unauthorized",
+        "Authentication required",
+    )
+
+
+class PermissionDeniedError(AppError):
+    status_code, code, message = (
+        status.HTTP_403_FORBIDDEN,
+        "forbidden",
+        "Current user has not access to this operation.",
+    )
 
 
 class ForbiddenError(AppError):
