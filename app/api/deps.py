@@ -68,7 +68,9 @@ CurrentAdmin = Annotated[User, Depends(require_admin)]
 Offset = Annotated[int, Query(ge=0)]
 Limit = Annotated[int, Query(ge=1, le=100)]
 
+from app.repositories.event import EventRepository
 from app.repositories.venue import VenueRepository
+from app.services.event import EventService
 from app.services.venue import VenueService
 
 
@@ -78,4 +80,11 @@ async def get_venue_service(
     return VenueService(VenueRepository(session=session))
 
 
+async def get_event_service(
+    session: SessionDep,
+) -> EventService:
+    return EventService(EventRepository(session=session))
+
+
 VenueServiceDep = Annotated[VenueService, Depends(get_venue_service)]
+EventServiceDep = Annotated[EventService, Depends(get_event_service)]
