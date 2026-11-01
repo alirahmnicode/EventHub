@@ -6,12 +6,6 @@ from app.schemas import VenueCreate, VenueRead, VenueUpdate
 router = APIRouter(prefix="/venues", tags=["venues"])
 
 
-router = APIRouter(
-    prefix="/venues",
-    tags=["venues"],
-)
-
-
 @router.get("", response_model=list[VenueRead])
 async def list_venues(
     service: VenueServiceDep,

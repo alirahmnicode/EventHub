@@ -3,20 +3,14 @@ from fastapi import status
 from app.schemas.errors import ErrorDetail, ErrorResponse
 
 ERROR_RESPONSES: dict[int | str, dict] = {
-    400: {"model": ErrorResponse},
-    401: {"model": ErrorResponse},
-    403: {"model": ErrorResponse},
-    404: {"model": ErrorResponse},
-    409: {"model": ErrorResponse},
-    422: {"model": ErrorResponse},
-    500: {"model": ErrorResponse},
+    code: {"model": ErrorResponse} for code in (400, 401, 403, 404, 409, 422, 500)
 }
 
 
 class AppError(Exception):
-    status_code = 500
-    code = "internal_error"
-    message = "Internal server error"
+    status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
+    code: str = "internal_error"
+    message: str = "Internal server error."
 
     def __init__(
         self,
@@ -25,7 +19,7 @@ class AppError(Exception):
         code: str | None = None,
         details: list[ErrorDetail] | None = None,
         headers: dict[str, str] | None = None,
-    ):
+    ) -> None:
         self.message = message or self.message
         self.code = code or self.code
         self.details = details
@@ -34,36 +28,40 @@ class AppError(Exception):
 
 
 class BadRequestError(AppError):
-    status_code, code, message = 400, "bad_request", "Bad request"
+    status_code = status.HTTP_400_BAD_REQUEST
+    code = "bad_request"
+    message = "Bad request."
 
 
 class UnauthorizedError(AppError):
-    status_code, code, message = (
-        status.HTTP_401_UNAUTHORIZED,
-        "unauthorized",
-        "Authentication required",
-    )
+    status_code = status.HTTP_401_UNAUTHORIZED
+    code = "unauthorized"
+    message = "Authentication required."
 
 
 class PermissionDeniedError(AppError):
-    status_code, code, message = (
-        status.HTTP_403_FORBIDDEN,
-        "forbidden",
-        "Current user has not access to this operation.",
-    )
+    status_code = status.HTTP_403_FORBIDDEN
+    code = "forbidden"
+    message = "You do not have permission to perform this action."
 
 
-class ForbiddenError(AppError):
-    status_code, code, message = (
-        status.HTTP_403_FORBIDDEN,
-        "forbidden",
-        "Current user has not access to this operation.",
-    )
+# Alias so both names behave identically in `except` clauses.
+ForbiddenError = PermissionDeniedError
 
 
 class NotFoundError(AppError):
-    status_code, code, message = 404, "not_found", "Resource not found"
+    status_code = status.HTTP_404_NOT_FOUND
+    code = "not_found"
+    message = "Resource not found."
 
 
 class ConflictError(AppError):
-    status_code, code, message = 409, "conflict", "Resource conflict"
+    status_code = status.HTTP_409_CONFLICT
+    code = "conflict"
+    message = "The request conflicts with the current state of the resource."
+
+
+class DomainValidationError(AppError):
+    status_code = 422  # literal avoids the Starlette _ENTITY/_CONTENT rename issue
+    code = "validation_error"
+    message = "The request could not be processed."
