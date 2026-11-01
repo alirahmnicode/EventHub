@@ -1,10 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from app import crud
 from app.api.deps import CurrentAdmin, EventServiceDep, Limit, Offset, SessionDep
-from app.models import Event
 from app.schemas import EventCreate, EventDetail, EventRead, EventUpdate
-from app.utils import or_404, remove_or_409
+from app.utils import or_404
 
 router = APIRouter(prefix="/events", tags=["events"])
 
