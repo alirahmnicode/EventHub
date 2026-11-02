@@ -35,10 +35,10 @@ class EventService:
             raise PermissionDeniedError()
         return event
 
-    def _is_valid_date_range(self, event: Event) -> bool:
-        if event.starts_at is None or event.ends_at is None:
+    def _is_valid_date_range(self, starts_at, ends_at) -> bool:
+        if starts_at is None or ends_at is None:
             return False
-        return event.starts_at < event.ends_at
+        return starts_at < ends_at
 
     async def get_event(self, event_id: int, user: User | None = None) -> Event:
         # only admin user can access draft events
@@ -83,7 +83,7 @@ class EventService:
         if not self._can_modify(user):
             raise PermissionDeniedError()
 
-        if not self._is_valid_date_range(event=data):
+        if not self._is_valid_date_range(data.starts_at, data.ends_at):
             raise DomainValidationError(
                 message="The start date must be before the end date."
             )
@@ -91,10 +91,17 @@ class EventService:
 
     async def update_event(self, event_id: int, data: EventUpdate, user: User) -> Event:
         event = await self._get_modifiable(event_id, user)
-        if not self._is_valid_date_range(event=data):
-            raise DomainValidationError(
-                message="The start date must be before the end date."
+
+        # if the dates (start or end) are changing, check date range, otherwise dont check date on partial update
+        if data.starts_at is not None or data.ends_at is not None:
+            starts_at = (
+                data.starts_at if data.starts_at is not None else event.starts_at
             )
+            ends_at = data.ends_at if data.ends_at is not None else event.ends_at
+            if not self._is_valid_date_range(starts_at, ends_at):
+                raise DomainValidationError(
+                    message="The start date must be before the end date."
+                )
         return await self.repo.update(event, data)
 
     async def delete_event(self, event_id: int, user: User) -> None:

@@ -1,12 +1,35 @@
+# ---------- model factories (unchanged) ----------
+from datetime import datetime, timezone
+
 import pytest
 
+from app.models.enums import EventStatus, UserRole
+from app.models.event import Event
 from app.models.user import User, UserRole  # ADAPT
 from app.models.venue import Venue  # ADAPT
+from app.repositories.event import EventRepository
 from app.repositories.venue import VenueRepository
+from app.schemas.event import EventCreate, EventUpdate
 from app.schemas.venue import VenueCreate, VenueUpdate
+from app.services.event import EventService
 from app.services.venue import VenueService
 
-# ---------- model factories (unchanged) ----------
+STARTS_AT = datetime(2030, 1, 1, 18, 0, tzinfo=timezone.utc)
+ENDS_AT = datetime(2030, 1, 1, 22, 0, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def make_repo(mocker):
+    """make_repo(SomeRepository) -> autospecced async-aware mock.
+    Wrong method names or wrong arguments fail the test."""
+
+    def _make(repo_cls):
+        return mocker.create_autospec(repo_cls, instance=True, spec_set=True)
+
+    return _make
+
+
+# ---------- users ----------
 
 
 @pytest.fixture
@@ -24,15 +47,6 @@ def make_user():
 
 
 @pytest.fixture
-def make_venue():
-    def _make(id: int = 1, **extra) -> Venue:
-        defaults = {"name": f"Venue {id}", "city": "Berlin"}  # ADAPT
-        return Venue(id=id, **{**defaults, **extra})
-
-    return _make
-
-
-@pytest.fixture
 def regular_user(make_user) -> User:
     return make_user(id=2, role=UserRole.CUSTOMER)
 
@@ -40,6 +54,18 @@ def regular_user(make_user) -> User:
 @pytest.fixture
 def admin(make_user) -> User:
     return make_user(id=99, role=UserRole.ADMIN)
+
+
+# ---------- venues ----------
+
+
+@pytest.fixture
+def make_venue():
+    def _make(id: int = 1, **extra) -> Venue:
+        defaults = {"name": f"Venue {id}", "city": "Berlin"}  # ADAPT
+        return Venue(id=id, **{**defaults, **extra})
+
+    return _make
 
 
 @pytest.fixture
@@ -54,20 +80,44 @@ def venue_create() -> VenueCreate:
 
 @pytest.fixture
 def venue_update() -> VenueUpdate:
-    return VenueUpdate(name="Renamed Hall")  # ADAPT
+    return VenueUpdate(name="Renamed Hall")
 
 
-# ---------- mocked repository ----------
-
-
-@pytest.fixture
-def repo(mocker, venue):
-    repo = mocker.create_autospec(VenueRepository, instance=True, spec_set=True)
-    repo.get.return_value = venue
-    repo.get_list.return_value = [venue]
-    return repo
+# ---------- events ----------
 
 
 @pytest.fixture
-def service(repo) -> VenueService:
-    return VenueService(repo)
+def make_event():
+    def _make(id: int = 1, **extra) -> Event:
+        defaults = {  # ADAPT to your columns
+            "title": f"Event {id}",
+            "venue_id": 1,
+            "status": EventStatus.PUBLISHED,
+            "starts_at": STARTS_AT,
+            "ends_at": ENDS_AT,
+        }
+        return Event(id=id, **{**defaults, **extra})
+
+    return _make
+
+
+@pytest.fixture
+def make_event_create():
+    def _make(**overrides) -> EventCreate:
+        defaults = {  # ADAPT
+            "title": "New Event",
+            "venue_id": 1,
+            "starts_at": STARTS_AT,
+            "ends_at": ENDS_AT,
+        }
+        return EventCreate(**{**defaults, **overrides})
+
+    return _make
+
+
+@pytest.fixture
+def make_event_update():
+    def _make(**fields) -> EventUpdate:
+        return EventUpdate(**fields)
+
+    return _make

@@ -2,9 +2,28 @@ import pytest
 
 from app.core.exceptions import NotFoundError, PermissionDeniedError
 from app.models.user import UserRole
+from app.repositories.venue import VenueRepository
 from app.services.venue import MAX_PAGE_SIZE, VenueService
 
 # ---------- get_venue ----------
+
+
+@pytest.fixture
+def venue(make_venue):
+    return make_venue(id=1)
+
+
+@pytest.fixture
+def repo(make_repo, venue):
+    repo = make_repo(VenueRepository)
+    repo.get.return_value = venue
+    repo.get_list.return_value = [venue]
+    return repo
+
+
+@pytest.fixture
+def service(repo):
+    return VenueService(repo)
 
 
 async def test_get_venue_returns_venue(service, repo, venue):
