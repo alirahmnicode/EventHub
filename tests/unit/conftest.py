@@ -2,15 +2,21 @@ from datetime import datetime, timezone
 
 import pytest
 
+from app.models import Event, TicketType, User, Venue
 from app.models.enums import EventStatus, UserRole
-from app.models.event import Event
-from app.models.user import User
-from app.models.venue import Venue  # ADAPT
-from app.schemas.event import EventCreate, EventUpdate
-from app.schemas.venue import VenueCreate, VenueUpdate
+from app.schemas import (
+    EventCreate,
+    EventUpdate,
+    TicketTypeCreate,
+    TicketTypeUpdate,
+    VenueCreate,
+    VenueUpdate,
+)
 
 STARTS_AT = datetime(2030, 1, 1, 18, 0, tzinfo=timezone.utc)
 ENDS_AT = datetime(2030, 1, 1, 22, 0, tzinfo=timezone.utc)
+SALES_START = datetime(2029, 12, 1, 9, 0, tzinfo=timezone.utc)
+SALES_END = datetime(2029, 12, 31, 9, 0, tzinfo=timezone.utc)
 
 
 @pytest.fixture
@@ -114,5 +120,55 @@ def make_event_create():
 def make_event_update():
     def _make(**fields) -> EventUpdate:
         return EventUpdate(**fields)
+
+    return _make
+
+
+# ---------- ticket types ----------
+
+
+@pytest.fixture
+def make_ticket_type():
+    def _make(id: int = 1, **extra) -> TicketType:
+        defaults = {
+            "event_id": 1,
+            "name": f"Ticket {id}",
+            "price_cents": 5000,
+            "currency": "USD",
+            "total_quantity": 100,
+            # Column defaults only apply on flush, so set these explicitly:
+            "reserved_quantity": 0,
+            "sold_quantity": 0,
+            "sales_start_at": SALES_START,
+            "sales_end_at": SALES_END,
+        }
+        return TicketType(id=id, **{**defaults, **extra})
+
+    return _make
+
+
+@pytest.fixture
+def make_ticket_type_create():
+    def _make(*, validate: bool = True, **overrides) -> TicketTypeCreate:
+        defaults = {
+            "event_id": 1,
+            "name": "General",
+            "price_cents": 5000,
+            "total_quantity": 100,
+            "sales_start_at": SALES_START,
+            "sales_end_at": SALES_END,
+        }
+        values = {**defaults, **overrides}
+        if validate:
+            return TicketTypeCreate(**values)
+        return TicketTypeCreate.model_construct(**values)  # skips the schema validator
+
+    return _make
+
+
+@pytest.fixture
+def make_ticket_type_update():
+    def _make(**fields) -> TicketTypeUpdate:
+        return TicketTypeUpdate(**fields)  # model_fields_set = exactly the keys passed
 
     return _make
