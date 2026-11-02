@@ -1,18 +1,13 @@
-# ---------- model factories (unchanged) ----------
 from datetime import datetime, timezone
 
 import pytest
 
 from app.models.enums import EventStatus, UserRole
 from app.models.event import Event
-from app.models.user import User, UserRole  # ADAPT
+from app.models.user import User
 from app.models.venue import Venue  # ADAPT
-from app.repositories.event import EventRepository
-from app.repositories.venue import VenueRepository
 from app.schemas.event import EventCreate, EventUpdate
 from app.schemas.venue import VenueCreate, VenueUpdate
-from app.services.event import EventService
-from app.services.venue import VenueService
 
 STARTS_AT = datetime(2030, 1, 1, 18, 0, tzinfo=timezone.utc)
 ENDS_AT = datetime(2030, 1, 1, 22, 0, tzinfo=timezone.utc)
