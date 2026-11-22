@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from app.schemas.base import ORMModel
 from pydantic import BaseModel, Field
 
 from app.models.enums import ReservationStatus
+from app.schemas.base import ORMModel
 
 
 class ReservationCreate(BaseModel):
@@ -12,7 +12,6 @@ class ReservationCreate(BaseModel):
 
     ticket_type_id: int
     quantity: int = Field(gt=0, le=10)
-    idempotency_key: str = Field(min_length=1, max_length=255)
 
 
 class ReservationRead(ORMModel):

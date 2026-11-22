@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.routes import admin, auth, events, ops, ticket_types, venues
+from app.api.routes import admin, auth, events, ops, reservation, ticket_types, venues
 
 api_router = APIRouter()
+api_router.include_router(reservation.router)
 api_router.include_router(ops.router)
 api_router.include_router(auth.router)
 api_router.include_router(venues.router)
