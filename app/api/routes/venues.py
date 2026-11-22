@@ -20,20 +20,3 @@ async def list_venues(
 @router.get("/{venue_id}", response_model=VenueRead)
 async def get_venue(venue_id: int, service: VenueServiceDep):
     return await service.get_venue(venue_id)
-
-
-@router.post("", response_model=VenueRead, status_code=status.HTTP_201_CREATED)
-async def create_venue(data: VenueCreate, service: VenueServiceDep, user: CurrentAdmin):
-    return await service.create_venue(data, user)
-
-
-@router.patch("/{venue_id}", response_model=VenueRead)
-async def update_venue(
-    venue_id: int, data: VenueUpdate, service: VenueServiceDep, user: CurrentAdmin
-):
-    return await service.update_venue(venue_id, data, user)
-
-
-@router.delete("/{venue_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_venue(venue_id: int, service: VenueServiceDep, user: CurrentAdmin):
-    await service.delete_venue(venue_id, user)

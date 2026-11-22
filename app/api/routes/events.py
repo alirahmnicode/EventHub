@@ -37,15 +37,3 @@ async def list_events(
 @router.get("/{event_id}", response_model=EventDetail)
 async def get_event(event_id: int, service: EventServiceDep):
     return await service.get_event(event_id=event_id)
-
-
-@router.patch("/{event_id}", response_model=EventRead)
-async def update_event(
-    event_id: int, body: EventUpdate, service: EventServiceDep, admin: CurrentAdmin
-):
-    return await service.update_event(event_id=event_id, data=body, user=admin)
-
-
-@router.delete("/{event_id}", status_code=204)
-async def delete_event(event_id: int, service: EventServiceDep, admin: CurrentAdmin):
-    return await service.delete_event(event_id=event_id, user=admin)

@@ -1,11 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter
 
 from app.api.deps import (
-    CurrentAdmin,
     CurrentUser,
     TicketTypeServiceDep,
 )
-from app.schemas import TicketTypeCreate, TicketTypeRead, TicketTypeUpdate
+from app.schemas import TicketTypeRead
 
 router = APIRouter(prefix="/ticket-types", tags=["ticket types"])
 
@@ -28,29 +27,3 @@ async def get_ticket_type(
     ticket_type_id: int, service: TicketTypeServiceDep, user: CurrentUser
 ):
     return await service.get_ticket_type(ticket_type_id, user)
-
-
-@router.post(
-    "/ticket-types", response_model=TicketTypeRead, status_code=status.HTTP_201_CREATED
-)
-async def create_ticket_type(
-    data: TicketTypeCreate, service: TicketTypeServiceDep, user: CurrentAdmin
-):
-    return await service.create_ticket_type(data, user)
-
-
-@router.patch("/ticket-types/{ticket_type_id}", response_model=TicketTypeRead)
-async def update_ticket_type(
-    ticket_type_id: int,
-    data: TicketTypeUpdate,
-    service: TicketTypeServiceDep,
-    user: CurrentAdmin,
-):
-    return await service.update_ticket_type(ticket_type_id, data, user)
-
-
-@router.delete("/ticket-types/{ticket_type_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_ticket_type(
-    ticket_type_id: int, service: TicketTypeServiceDep, user: CurrentAdmin
-):
-    await service.delete_ticket_type(ticket_type_id, user)
